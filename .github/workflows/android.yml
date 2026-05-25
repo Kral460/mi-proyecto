@@ -8,20 +8,30 @@ jobs:
     - name: Checkout del codigo
       uses: actions/checkout@v4
 
-    - name: Configurar Java
+    - name: Configurar Java 17
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '17'
 
+    - name: Configurar Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Instalar Dependencias de Buildozer
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev build-essential libasound2-dev libpulse-dev
+        pip install --user --upgrade buildozer cython virtualenv
+
     - name: Desempaquetar proyecto
       run: unzip -o proyecto_kral.zip -d .
 
     - name: Compilar con Buildozer
-      uses: nttld/setup-buildozer@v1
-
-    - name: Forzar compilacion android
-      run: buildozer android debug
+      run: |
+        export PATH=$PATH:~/.local/bin
+        buildozer android debug
 
     - name: Guardar APK Resultante
       uses: actions/upload-artifact@v4
