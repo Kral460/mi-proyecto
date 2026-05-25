@@ -3,21 +3,26 @@ on: [push, workflow_dispatch]
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout del codigo
       uses: actions/checkout@v4
 
+    - name: Configurar Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
     - name: Desempaquetar proyecto
       run: unzip -o proyecto_kral.zip -d .
 
-    - name: Configurar Entorno de Compilacion
-      uses: ActionFolder/buildozer-action@v2
-      with:
-        repository_root: .
-        buildozer_version: stable
-        command: buildozer android debug
-        
+    - name: Compilar con Buildozer
+      uses: nttld/setup-buildozer@v1
+
+    - name: Forzar compilacion android
+      run: buildozer android debug
+
     - name: Guardar APK Resultante
       uses: actions/upload-artifact@v4
       with:
